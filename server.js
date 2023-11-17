@@ -2,6 +2,7 @@ import 'dotenv/config.js';
 import bodyParser from 'body-parser';
 import express from 'express';
 import mongoose from 'mongoose';
+import userRoutes from './routes/userRoutes.js';
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -18,7 +19,7 @@ const port = 3000;
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/v1.0/admin', adminRoutes);
+// app.use('/api/v1.0/admin', adminRoutes);
 app.use('/api/v1.0/user', userRoutes);
 
 app.use((err, req, res, next) => {
