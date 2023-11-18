@@ -1,6 +1,20 @@
 import express from 'express';
 import Admin from '../models/adminModal.js';
 import bcrypt from 'bcrypt';
+import multer from 'multer';
+import { baseUrl } from '../utils/index.js';
+
+// Multer configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 const adminRoutes = express();
 
@@ -9,6 +23,7 @@ adminRoutes.post('/login', async (req, res) => {
     const admin = await Admin.findOne({
       mobile_no: req.body.mobile_no,
     });
+
     if (admin) {
       const isPasswordValid = await bcrypt.compare(
         req.body.password,
@@ -16,6 +31,7 @@ adminRoutes.post('/login', async (req, res) => {
       );
 
       if (isPasswordValid) {
+        admin.img = baseUrl + admin.img;
         res.status(200).send({
           success: true,
           message: 'Login successful.',
@@ -34,12 +50,11 @@ adminRoutes.post('/login', async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(404).json({ success: false, message: e.message });
+    res.status(404).json({ success: false, message: error.message });
   }
 });
 
-adminRoutes.post('/signup', async (req, res) => {
-  console.log(req.body);
+adminRoutes.post('/signup', upload.single('img'), async (req, res) => {
   try {
     const findEmail = await Admin.findOne({
       email: req.body.email,
@@ -69,10 +84,11 @@ adminRoutes.post('/signup', async (req, res) => {
           lng: req.body.lng,
           description: req.body.description,
           address: req.body.address,
-          img: req.body.img,
+          img: req.file.path,
           time: req.body.time,
         });
         const admin = await newAdmin.save();
+        admin.img = baseUrl + admin.img;
         res.status(201).send({
           success: true,
           message: 'Admin Registered Succesfully.',

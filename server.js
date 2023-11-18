@@ -17,8 +17,11 @@ mongoose
 const app = express();
 const port = 3000;
 
-app.use(express.json());
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded files statically
+app.use('/uploads', express.static('uploads'));
 
 app.use('/api/v1.0/admin', adminRoutes);
 app.use('/api/v1.0/user', userRoutes);
