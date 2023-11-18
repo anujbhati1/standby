@@ -1,7 +1,6 @@
 import express from 'express';
 import User from '../models/userModal.js';
 import bcrypt from 'bcrypt';
-import Admin from '../models/adminModal.js';
 import { hashPassword } from '../utils/index.js';
 
 const userRoutes = express.Router();
@@ -83,35 +82,6 @@ userRoutes.post('/signup', async (req, res) => {
           },
         });
       }
-    }
-  } catch (e) {
-    res.status(404).json({ success: false, message: e.message });
-  }
-});
-
-userRoutes.get('/add_order/:adminId/:userId', async (req, res) => {
-  try {
-    const findAdmin = await Admin.findById(req.params.adminId);
-    if (findAdmin) {
-      const findUser = await User.findById(req.params.userId);
-      if (findUser) {
-        findAdmin.totalOrders.push(findUser);
-        findAdmin.save();
-        res.status(200).send({
-          success: true,
-          message: 'Add Order Successfully.',
-        });
-      } else {
-        res.status(404).send({
-          success: false,
-          message: 'User Not Found.',
-        });
-      }
-    } else {
-      res.status(404).send({
-        success: false,
-        message: 'Shop Not Found.',
-      });
     }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });

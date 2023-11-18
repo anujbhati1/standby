@@ -22,12 +22,6 @@ const adminSchema = new mongoose.Schema({
   address: { type: String },
   img: { type: String },
   time: { type: String },
-  totalOrders: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-  ],
 });
 
 const Admin = mongoose.model('Admin', adminSchema);

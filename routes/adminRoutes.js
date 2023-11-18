@@ -102,27 +102,4 @@ adminRoutes.post('/signup', upload.single('img'), async (req, res) => {
   }
 });
 
-adminRoutes.get('/get_all_orders/:adminId', async (req, res) => {
-  try {
-    const admin = await Admin.findById(req.params.adminId).populate(
-      'totalOrders'
-    );
-
-    if (admin) {
-      res.status(200).send({
-        success: true,
-        message: 'Login successful.',
-        data: admin.totalOrders,
-      });
-    } else {
-      res.status(404).send({
-        success: false,
-        message: 'Admin Not Found.',
-      });
-    }
-  } catch (error) {
-    res.status(404).json({ success: false, message: error.message });
-  }
-});
-
 export default adminRoutes;

@@ -4,6 +4,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import appointmentRoute from './routes/appointmentRoute.js';
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -25,6 +26,8 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/api/v1.0/admin', adminRoutes);
 app.use('/api/v1.0/user', userRoutes);
+app.use('/api/v1.0/user', userRoutes);
+app.use('/api/v1.0/appointment', appointmentRoute);
 
 app.use((err, req, res, next) => {
   res.status(500).send({ success: false, message: err.message });
