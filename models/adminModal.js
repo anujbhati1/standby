@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
 
 const adminSchema = new mongoose.Schema({
   business_name: {
@@ -23,18 +22,12 @@ const adminSchema = new mongoose.Schema({
   address: { type: String },
   img: { type: String },
   time: { type: String },
-});
-
-// Hash the password before saving to the database
-adminSchema.pre('save', async function (next) {
-  try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(this.password, salt);
-    this.password = hashedPassword;
-    next();
-  } catch (error) {
-    next(error);
-  }
+  totalOrders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
 });
 
 const Admin = mongoose.model('Admin', adminSchema);

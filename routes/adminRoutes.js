@@ -2,7 +2,7 @@ import express from 'express';
 import Admin from '../models/adminModal.js';
 import bcrypt from 'bcrypt';
 import multer from 'multer';
-import { baseUrl } from '../utils/index.js';
+import { baseUrl, hashPassword } from '../utils/index.js';
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -74,12 +74,13 @@ adminRoutes.post('/signup', upload.single('img'), async (req, res) => {
           message: 'Mobile already registered.',
         });
       } else {
+        const hashedPassword = await hashPassword(req.body.password);
         const newAdmin = new Admin({
           business_name: req.body.business_name,
           email: req.body.email,
           mobile_no: req.body.mobile_no,
           alt_mobile_no: req.body.alt_mobile_no,
-          password: req.body.password,
+          password: hashedPassword,
           lat: req.body.lat,
           lng: req.body.lng,
           description: req.body.description,
