@@ -1,10 +1,14 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const adminSchema = new mongoose.Schema({
-  business_name: { type: String, required: true },
+  business_name: {
+    type: String,
+    required: [true, 'Business name is required.'],
+  },
   mobile_no: {
     type: String,
-    required: true,
+    required: [true, 'Mobile Number is required.'],
     unique: [true, 'Mobile Number already exist.'],
   },
   alt_mobile_no: {
@@ -12,12 +16,25 @@ const adminSchema = new mongoose.Schema({
     unique: [true, 'Alternate Mobile Number already exist.'],
   },
   email: { type: String, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, required: [true, 'Password is required.'] },
   lat: { type: String },
   lng: { type: String },
   description: { type: String },
   address: { type: String },
   img: { type: String },
+  time: { type: String },
+});
+
+// Hash the password before saving to the database
+adminSchema.pre('save', async function (next) {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(this.password, salt);
+    this.password = hashedPassword;
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 const Admin = mongoose.model('Admin', adminSchema);
