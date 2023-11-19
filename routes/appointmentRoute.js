@@ -72,4 +72,22 @@ appointmentRoute.get('/get_all_appointments/:id', async (req, res) => {
   }
 });
 
+appointmentRoute.get('/change_status/:id/:status', async (req, res) => {
+  try {
+    const { id, status } = req.params;
+    const findApointment = await Appointment.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+    res.status(200).send({
+      success: true,
+      message: `Appointment ${status}.`,
+      data: findApointment,
+    });
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
+
 export default appointmentRoute;
