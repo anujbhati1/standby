@@ -1,7 +1,9 @@
 import express from 'express';
 import User from '../models/userModal.js';
 import bcrypt from 'bcrypt';
-import { hashPassword } from '../utils/index.js';
+import { hashPassword, baseUrl } from '../utils/index.js';
+import Admin from '../models/adminModal.js';
+import Appointment from '../models/appointmentModal.js';
 
 const userRoutes = express.Router();
 
@@ -82,6 +84,53 @@ userRoutes.post('/signup', async (req, res) => {
           },
         });
       }
+    }
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
+
+userRoutes.get('/get_all_businesses', async (req, res) => {
+  try {
+    const findAdmin = await Admin.find();
+    res.status(200).send({
+      success: true,
+      message: 'All shops fetched successfully.',
+      data: findAdmin,
+    });
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
+
+userRoutes.get('/get_my_all_apointment/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const findUser = await User.findById(userId);
+    if (findUser) {
+      const findApointment = await Appointment.find({ user: userId }).populate(
+        'admin'
+      );
+
+      // Calculate usersAhead count for each appointment
+      const appointmentsWithUsersAhead = await Promise.all(
+        findApointment.map(async (appointment) => {
+          const usersAheadCount = await appointment.usersAhead;
+          appointment.admin.img = baseUrl + appointment.admin.img;
+          return { ...appointment.toObject(), usersAheadCount };
+        })
+      );
+
+      res.status(200).send({
+        success: true,
+        message: 'My all apointments.',
+        data: appointmentsWithUsersAhead,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: 'User Not Found.',
+      });
     }
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
