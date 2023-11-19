@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { hashPassword, baseUrl } from '../utils/index.js';
 import Admin from '../models/adminModal.js';
 import Appointment from '../models/appointmentModal.js';
+import Notification from '../models/notificationModal.js';
 
 const userRoutes = express.Router();
 
@@ -132,6 +133,20 @@ userRoutes.get('/get_my_all_apointment/:userId', async (req, res) => {
         message: 'User Not Found.',
       });
     }
+  } catch (e) {
+    res.status(404).json({ success: false, message: e.message });
+  }
+});
+
+userRoutes.get('/get_notifications/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const findAdmin = await Notification.find({ userId: userId });
+    res.status(200).send({
+      success: true,
+      message: 'Notification Get Successfully.',
+      data: findAdmin,
+    });
   } catch (e) {
     res.status(404).json({ success: false, message: e.message });
   }

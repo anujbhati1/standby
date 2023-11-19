@@ -2,6 +2,7 @@ import express from 'express';
 import Admin from '../models/adminModal.js';
 import User from '../models/userModal.js';
 import Appointment from '../models/appointmentModal.js';
+import Notification from '../models/notificationModal.js';
 
 const appointmentRoute = express.Router();
 
@@ -80,6 +81,9 @@ appointmentRoute.get('/change_status/:id/:status', async (req, res) => {
       { status },
       { new: true }
     );
+    if (status === 'completed') {
+      youAreNextNotification();
+    }
     res.status(200).send({
       success: true,
       message: `Appointment ${status}.`,
@@ -89,5 +93,15 @@ appointmentRoute.get('/change_status/:id/:status', async (req, res) => {
     res.status(404).json({ success: false, message: e.message });
   }
 });
+
+async function youAreNextNotification() {
+  const findApointment = await Appointment.findOne({ status: 'scheduled' });
+  const newNotification = new Notification({
+    userId: findApointment.user,
+    title: 'You are next.',
+    description: 'You are next in line so be prepared for coming.',
+  });
+  newNotification.save();
+}
 
 export default appointmentRoute;
